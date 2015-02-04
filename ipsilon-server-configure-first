@@ -34,6 +34,15 @@ if ( ! -e /etc/ipsilon-installed ) ; then
     echo "$PASSWORD" | kinit admin
     ipa service-add HTTP/$(hostname -f)@$REALM
 
+    # Enable certmonger and get a certificate for TLS
+    systemctl enable certmonger.service
+    systemctl start certmonger.service
+    ipa-getcert request -w -k /etc/pki/tls/private/ipsilon.key -f /etc/pki/tls/certs/ipsilon.crt
+
+    # Configure mod_ssl to use our certificate
+    sed -i 's/localhost\.crt/ipsilon\.crt/' /etc/httpd/conf.d/ssl.conf
+    sed -i 's/localhost\.key/ipsilon\.key/' /etc/httpd/conf.d/ssl.conf
+
     # Allow the default Ipsilon installer options to be overridden
     if [ -z $IPSILON_INSTALL_OPTIONS ] ; then
         IPSILON_INSTALL_OPTIONS="--ipa yes --krb yes --saml2 yes --admin-user admin@$REALM"
@@ -52,6 +61,8 @@ if ( ! -e /etc/ipsilon-installed ) ; then
 fi
 
 # Start Ipsilon
+echo 'Starting Certmonger'
+systemctl start certmonger.service
 echo 'Starting Ipsilon'
 systemctl start httpd.service
 echo 'Ipsilon started'
