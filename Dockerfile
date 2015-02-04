@@ -3,7 +3,6 @@ FROM adelton/freeipa-client:fedora-21
 MAINTAINER Nathan Kinder
 
 # Install Ipsilon packages from Copr
-#RUN yum install hostname && yum clean all
 RUN yum install -y yum-plugin-copr && yum copr enable -y puiterwijk/Ipsilon-master && yum clean all
 RUN yum install -y ipsilon ipsilon-authkrb mod_ssl && yum clean all
 
