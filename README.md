@@ -12,9 +12,7 @@ of this repository:
 
     docker build -t ipsilon .
 
-Ipsilon is still in early development, so the image currently uses regularly
-produced developer builds of Ipsilon from Copr.  Fedora 21 is currently used,
-but this will be expanded to include other platforms as Ipsilon matures.
+The image uses Ipsilon packages from from the official Fedora repos.
 
 # Using the image
 The easiest way to quickly set up an Ipsilon container is to create a FreeIPA
