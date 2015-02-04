@@ -45,11 +45,13 @@ if [ ! -e /etc/ipsilon-installed ] ; then
 
     # Allow the default Ipsilon installer options to be overridden
     if [ -z $IPSILON_INSTALL_OPTIONS ] ; then
-        IPSILON_INSTALL_OPTIONS="--ipa yes --krb yes --saml2 yes --admin-user admin@$REALM"
+        IPSILON_INSTALL_OPTIONS="--ipa yes --krb yes --saml2 yes --admin-user admin"
     fi
 
     # Install Ipsilon
     if /usr/sbin/ipsilon-server-install $IPSILON_INSTALL_OPTIONS ; then
+        # Enable local mapping to allow Kerberos or form-based admin access
+        sed -i 's/# KrbLocalUserMapping On/KrbLocalUserMapping On/' /etc/httpd/conf.d/ipsilon-idp.conf
         echo 'Ipsilon server configured.'
         touch /etc/ipsilon-installed
         systemctl enable httpd.service

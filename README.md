@@ -33,8 +33,8 @@ The FreeIPA server should also use Fedora 21, as the FreeIPA admin commands
 used when installing Ipsilon need to match the FreeIPA server version to work
 properly.
 
-Ipsilon will be configured for Kerberos authentication, and the FreeIPA admin
-user will be set up as the admin of Ipsilon.
+Ipsilon will be configured for both Kerberos and forms-based authentication,
+and the FreeIPA admin user will be set up as the admin of Ipsilon.
 
 If you are using your FreeIPA server container for DNS, Ipsilon will be
 available at the following URL:
