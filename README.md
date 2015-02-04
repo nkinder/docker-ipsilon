@@ -38,6 +38,11 @@ properly.
 Ipsilon will be configured for Kerberos authentication, and the FreeIPA admin
 user will be set up as the admin of Ipsilon.
 
+If you are using your FreeIPA server container for DNS, Ipsilon will be
+available at the following URL:
+
+    https://ipsilon.example.test/idp
+
 # Additional Info
 * Ipsilon Project - https://fedorahosted.org/ipsilon/
 * FreeIPA Project - http://www.freeipa.org/
