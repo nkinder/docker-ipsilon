@@ -25,7 +25,7 @@ trap stop_running TERM
 /usr/sbin/ipa-client-configure-first -s $@
 
 # Check if Ipsilon has already been installed
-if ( ! -e /etc/ipsilon-installed ) ; then
+if [ ! -e /etc/ipsilon-installed ] ; then
     # Determine the Kerberos realm name
     DOMAIN=$(dnsdomainname)
     REALM=${DOMAIN^^}
