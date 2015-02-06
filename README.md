@@ -27,7 +27,7 @@ before creating the Ipsilon container.  You can track the progress by using
 the "docker logs" command shown above.  When the FreeIPA server configuration
 is complete, create the Ipsilon container as follows:
 
-    docker run --name ipsilon -h ipsilon.example.test --link freeipa-server:ipa -e PASSWORD=<FreeIPA Admin Password> ipsilon
+    docker run --name ipsilon -d -h ipsilon.example.test --link freeipa-server:ipa -e PASSWORD=<FreeIPA Admin Password> ipsilon
 
 If you want to expose the Ipsilon service on your actual network, you will want
 to map port 443 to your container host system.  In addition, you will want to
