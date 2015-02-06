@@ -30,8 +30,15 @@ if [ ! -e /etc/ipsilon-installed ] ; then
     DOMAIN=$(dnsdomainname)
     REALM=${DOMAIN^^}
 
-    # Add a service for Ipsilon in FreeIPA
+    # Obtain a Kerberos ticket to perform IPA admin operations
     echo "$PASSWORD" | kinit admin
+
+    # Update our A record if requested
+    if [ $IPSILON_IP_ADDRESS ] ; then
+        ipa dnsrecord-mod $(dnsdomainname) $(hostname -s) --a-rec=$IPSILON_IP_ADDRESS
+    fi
+
+    # Add a service for Ipsilon in FreeIPA
     ipa service-add HTTP/$(hostname -f)@$REALM
 
     # Enable certmonger and get a certificate for TLS
@@ -55,6 +62,9 @@ if [ ! -e /etc/ipsilon-installed ] ; then
         echo 'Ipsilon server configured.'
         touch /etc/ipsilon-installed
         systemctl enable httpd.service
+
+        # Destroy our Kerberos credentials cache
+        kdestroy
     else
         ret=$?
         echo 'Ipsilon server configuration failed.'
