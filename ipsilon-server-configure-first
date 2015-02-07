@@ -59,6 +59,11 @@ if [ ! -e /etc/ipsilon-installed ] ; then
     if /usr/sbin/ipsilon-server-install $IPSILON_INSTALL_OPTIONS ; then
         # Enable local mapping to allow Kerberos or form-based admin access
         sed -i 's/# KrbLocalUserMapping On/KrbLocalUserMapping On/' /etc/httpd/conf.d/ipsilon-idp.conf
+
+        # Set up redirect rules for httpd
+        sed -i 's/<\/VirtualHost>/RedirectMatch \^\/\$ \/idp\n<\/VirtualHost>/' /etc/httpd/conf.d/ssl.conf
+        echo "RedirectMatch ^/\$ https://$(hostname -f)/idp" >> /etc/httpd/conf.d/ipsilon-idp.conf
+
         echo 'Ipsilon server configured.'
         touch /etc/ipsilon-installed
         systemctl enable httpd.service
