@@ -52,7 +52,8 @@ if [ ! -e /etc/ipsilon-installed ] ; then
 
     # Allow the default Ipsilon installer options to be overridden
     if [ -z $IPSILON_INSTALL_OPTIONS ] ; then
-        IPSILON_INSTALL_OPTIONS="--ipa yes --krb yes --saml2 yes --admin-user admin"
+        IPSILON_INSTALL_OPTIONS="--ipa=yes --krb yes --form=yes --saml2=yes --info-sssd=yes \
+                                 --info-sssd-domain=$(dnsdomainname) --admin-user=admin"
     fi
 
     # Install Ipsilon
