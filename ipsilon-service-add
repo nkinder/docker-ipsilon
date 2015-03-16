@@ -1,0 +1,65 @@
+#!/usr/bin/python
+
+import sys
+from ipalib import api
+from ipalib import errors as ipaerrors
+
+
+def add_service(princ=None):
+    api.bootstrap(context='ipsilon_service')
+    api.finalize()
+
+    try:
+        api.Backend.rpcclient.connect()
+        print("Checking RPC connection to IPA...")
+        api.Backend.rpcclient.forward('ping')
+        print("Success")
+    except ipaerrors.KerberosError as e:
+        if api.Backend.rpcclient.isconnected():
+            api.Backend.rpcclient.disconnect()
+        raise Exception('Invalid credentials: [%s]' % str(e))
+    except ipaerrors.PublicError as e:
+        if api.Backend.rpcclient.isconnected():
+            api.Backend.rpcclient.disconnect()
+        raise Exception('Unable to connect to IPA server: %s' % str(e))
+
+    # Specify an older version to work on nearly any master. Force is
+    # set to True so a DNS A record is not required for adding the
+    # service.
+    try:
+        print("Adding service to IPA...")
+        api.Backend.rpcclient.forward(
+            'service_add',
+            unicode(princ),
+            force=True,
+            version=u'2.0'
+        )
+        print("Success")
+    except ipaerrors.DuplicateEntry:
+        raise Exception('Principal %s already exists' % princ)
+    except ipaerrors.NotFound as e:
+        raise Exception('%s' % e)
+    except ipaerrors.ACIError as e:
+        raise Exception('Invalid credentials: [%s]' % str(e))
+    finally:
+        server = api.Backend.rpcclient.api.env.server
+        if api.Backend.rpcclient.isconnected():
+            api.Backend.rpcclient.disconnect()
+
+
+def usage():
+    print("Usage: %s <principal>" % sys.argv[0])
+    sys.exit(1)
+
+
+if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        usage()
+
+    try:
+        add_service(sys.argv[1])
+    except Exception as e:
+        print("Unable to add service - %s" % str(e))
+        sys.exit(1)
+
+    sys.exit(0)

@@ -39,7 +39,7 @@ if [ ! -e /etc/ipsilon-installed ] ; then
     fi
 
     # Add a service for Ipsilon in FreeIPA
-    ipa service-add HTTP/$(hostname -f)@$REALM
+    /usr/sbin/ipsilon-service-add HTTP/$(hostname -f)@$REALM
 
     # Enable certmonger and get a certificate for TLS
     systemctl enable certmonger.service
