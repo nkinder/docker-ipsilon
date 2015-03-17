@@ -11,7 +11,9 @@ RUN yum install -y ipsilon ipsilon-tools ipsilon-authkrb ipsilon-infosssd \
 ADD ipsilon-server-configure-first /usr/sbin/ipsilon-server-configure-first
 RUN chmod -v +x /usr/sbin/ipsilon-server-configure-first
 
-# Add a script to allow us to create services in IPA
+# Add a script to allow us to perform IPA admin operations
+# without requiring freeipa-admintools
+ADD ipsilon-dns-update /usr/sbin/ipsilon-dns-update
 ADD ipsilon-service-add /usr/sbin/ipsilon-service-add
 
 EXPOSE 80 443

@@ -1,0 +1,62 @@
+#!/usr/bin/python
+
+import sys
+from ipalib import api
+from ipalib import errors as ipaerrors
+
+
+def update_dns(domainname=None, hostname=None, addr=None):
+    api.bootstrap(context='ipsilon_dns')
+    api.finalize()
+
+    try:
+        api.Backend.rpcclient.connect()
+        print("Checking RPC connection to IPA...")
+        api.Backend.rpcclient.forward('ping')
+        print("Success")
+    except ipaerrors.KerberosError as e:
+        if api.Backend.rpcclient.isconnected():
+            api.Backend.rpcclient.disconnect()
+        raise Exception('Invalid credentials: [%s]' % str(e))
+    except ipaerrors.PublicError as e:
+        if api.Backend.rpcclient.isconnected():
+            api.Backend.rpcclient.disconnect()
+        raise Exception('Unable to connect to IPA server: %s' % str(e))
+
+    # Specify an older version to work on nearly any master.
+    try:
+        print("Updating DNS record in IPA...")
+        api.Backend.rpcclient.forward(
+            'dnsrecord_mod',
+            dnszoneidnsname=unicode(domainname),
+            idnsname=unicode(hostname),
+            arecord=unicode(addr),
+            version=u'2.0'
+        )
+        print("Success")
+    except ipaerrors.NotFound as e:
+        raise Exception('%s' % e)
+    except ipaerrors.ACIError as e:
+        raise Exception('Invalid credentials: [%s]' % str(e))
+    finally:
+        server = api.Backend.rpcclient.api.env.server
+        if api.Backend.rpcclient.isconnected():
+            api.Backend.rpcclient.disconnect()
+
+
+def usage():
+    print("Usage: %s <domainname> <hostname> <ip_addr>" % sys.argv[0])
+    sys.exit(1)
+
+
+if __name__ == '__main__':
+    if len(sys.argv) != 4:
+        usage()
+
+    try:
+        update_dns(sys.argv[1], sys.argv[2], sys.argv[3])
+    except Exception as e:
+        print("Unable to update DNS - %s" % str(e))
+        sys.exit(1)
+
+    sys.exit(0)

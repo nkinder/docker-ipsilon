@@ -35,7 +35,7 @@ if [ ! -e /etc/ipsilon-installed ] ; then
 
     # Update our A record if requested
     if [ $IPSILON_IP_ADDRESS ] ; then
-        ipa dnsrecord-mod $(dnsdomainname) $(hostname -s) --a-rec=$IPSILON_IP_ADDRESS
+        /usr/sbin/ipsilon-dns-update $(dnsdomainname) $(hostname -s) $IPSILON_IP_ADDRESS
     fi
 
     # Add a service for Ipsilon in FreeIPA
